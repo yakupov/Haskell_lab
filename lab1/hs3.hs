@@ -97,6 +97,33 @@ Zero `divide` m = Zero;
 (Plus m) `divide` (Minus n) = Minus ((Plus m) `pdivide` (Plus n)) `plus` (Plus (Succ One));
 (Minus m) `divide` (Plus n) = Minus ((Plus m) `pdivide` (Plus n)) `plus` (Plus (Succ One));
 
+-- integer %
+mymod :: Integers -> Integers -> Integers;
+mymod m n = m `minus` ((m `divide` n) `mult` n)
+
+-- integer abs
+myabs (Plus m) = Plus m
+myabs (Minus m) = Plus m
+
+-- internal min
+minInt :: Integers -> Integers -> Integers -> Integers;
+minInt (Minus delta) a b = a
+minInt (Plus delta) a b = b
+
+-- integer min
+minAbs :: Integers -> Integers -> Integers;
+minAbs a b = minInt ((myabs a) `minus` (myabs b)) a b
+
+-- internal gcd
+mygcdInt :: Integers -> Integers -> Integers -> Integers -> Integers -> Integers;
+mygcdInt (Plus amymodc) bmymodc a b c = mygcdInt (a `mymod` (c `minus` (Plus One))) (b `mymod` (c `minus` (Plus One))) a b (c `minus` (Plus One))
+mygcdInt (Minus amymodc) bmymodc a b c = mygcdInt (a `mymod` (c `minus` (Plus One))) (b `mymod` (c `minus` (Plus One))) a b (c `minus` (Plus One))
+mygcdInt Zero Zero a b c = c
+
+-- integer gcd
+mygcd :: Integers -> Integers -> Integers;
+mygcd a b = mygcdInt (a `mymod` (minAbs a b)) (b `mymod` (minAbs a b)) a b (minAbs a b)
+
 -- rational +
 rplus :: Rationals -> Rationals -> Rationals
 rplus (Slash a b) (Slash c d) = Slash ((a `mult` d) `plus` (c `mult` b)) (b `mult` d)
@@ -113,10 +140,15 @@ rmult (Slash a b) (Slash c d) = Slash (a `mult` c) (b `mult` d)
 rdiv :: Rationals -> Rationals -> Rationals
 rdiv (Slash a b) (Slash c d) = Slash (a `mult` d) (b `mult` c)
 
+-- shorten the rational
+shorten :: Rationals -> Rationals
+shorten (Slash a b) = Slash (a `divide` (mygcd a b)) (b `divide` (mygcd a b))
+
 --
 -- Test
 --
 main :: IO ();
 --main = print (toInt ( (toSuccInteger (1)) `plus` (toSuccInteger (-2)) ) )
-main = print (toIntR ( (toSuccRat 1 2) `rdiv` (toSuccRat (-4) 16)))
+main = print (toIntR (shorten ( (toSuccRat 1 2) `rdiv` (toSuccRat (-4) 16))))
+--main = print (toInt ( (toSuccInteger (1)) `mygcd` (toSuccInteger (-2)) ) )
 
