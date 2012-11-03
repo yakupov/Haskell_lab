@@ -27,7 +27,10 @@ oneOf x = like (`elem` x)
 -- В префиксе головы сейчас нечто вполне определённое
 string :: Eq s => [s] -> Monstupar s [s]
 string [] = return []
--- lolwut?!
+string (x:xs) = do
+	r <- char x
+	rs <- string xs
+	return (r:rs)
 
 -- "Звёздочка" -- запустить парсер максимальное (ноль или более) число раз и
 -- саккумулировать результыты
